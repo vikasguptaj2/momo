@@ -1,0 +1,87 @@
+{
+  "name": "caught-you-slacking",
+  "version": "0.3.0",
+  "private": true,
+  "description": "A Windows desktop accountability companion powered by Scout.",
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "native:publish": "dotnet publish native/WindowsMonitor.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o resources/windows-monitor",
+    "dist:win": "npm run native:publish && npm run build && electron-builder --win nsis",
+    "setup:win": "powershell -ExecutionPolicy Bypass -File scripts/setup-windows.ps1",
+    "ensure:electron": "install-electron --no",
+    "rebuild:native": "electron-builder install-app-deps",
+    "predev": "npm run ensure:electron && npm run rebuild:native",
+    "prebuild": "npm run ensure:electron && npm run rebuild:native"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "drizzle-orm": "^0.45.4",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "vite": "^7.3.7",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "electron": "^45.2.3",
+    "electron-builder": "^26.0.12",
+    "electron-vite": "^6.0.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "lucide-react": "^0.468.0"
+  },
+  "build": {
+    "appId": "com.caughtyouslacking.desktop",
+    "productName": "CaughtYouSlacking",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "out/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/icon.ico",
+        "to": "icon.ico"
+      },
+      {
+        "from": "resources/windows-monitor/WindowsMonitor.exe",
+        "to": "windows-monitor/WindowsMonitor.exe"
+      }
+    ],
+    "win": {
+      "icon": "resources/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "deleteAppDataOnUninstall": false
+    },
+    "npmRebuild": true,
+    "asar": true
+  },
+  "engines": {
+    "node": ">=22.12.0",
+    "npm": ">=10.0.0"
+  }
+}
